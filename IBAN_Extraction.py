@@ -9,6 +9,7 @@ import streamlit as st
 import pandas as pd
 from schwifty import IBAN
 import io
+import os
 import xlsxwriter
 
 
@@ -41,7 +42,7 @@ st.write("Step 2: Upload Filled Template")
 excel_file = st.file_uploader("Select your IBAN File to start extraction (Kindly ensure that only one column is provided and is named as 'IBAN')")  
 
 if excel_file is not None:
-
+    file_name = os.path.basename(excel_file)
     df = pd.read_excel(excel_file, dtype = object)
 
     new = df["IBAN"].astype(str)
@@ -128,7 +129,7 @@ if excel_file is not None:
         download2 = st.download_button(
             label="Download data as Excel",
             data=buffer,
-            file_name='IBAN_Output.xlsx',
+            file_name = file_name,
             mime='application/vnd.ms-excel'
         )
         
