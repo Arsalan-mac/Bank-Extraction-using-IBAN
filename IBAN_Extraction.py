@@ -42,7 +42,7 @@ st.write("Step 2: Upload Filled Template")
 excel_file = st.file_uploader("Select your IBAN File to start extraction (Kindly ensure that only one column is provided and is named as 'IBAN')")  
 
 if excel_file is not None:
-    file_name = os.path.basename(excel_file)
+    file_name = excel_file.name
     df = pd.read_excel(excel_file, dtype = object)
 
     new = df["IBAN"].astype(str)
