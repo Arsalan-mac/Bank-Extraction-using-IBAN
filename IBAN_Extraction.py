@@ -107,7 +107,30 @@ if excel_file is not None:
     df = pd.merge(df, df1, how = 'left', on='IBAN',suffixes=('', '_y'))
     
     df.drop_duplicates(subset=['IBAN'], keep='first', inplace = True)
-    
+
+    special_countries = ['IT', 'ES', 'FR', 'HU', 'CY', 'IL', 'BG', 'GR', 'IS', 'PL', 'TR']
+
+    # Create new column with condition
+    df['New_Bank_Key'] = df.apply(
+        lambda row: row['BANKL'] + row['Branch_code'] 
+        if row['BANKS'] in special_countries 
+        else row['BANKL'], 
+        axis=1
+    )
+
+
+    def generate_bankn(row):
+        if row['BANKS'] == 'BE':
+            iban = row['IBAN']
+            middle_7 = iban[-9:][:7]  # Get 9 from right, then take first 7
+            last_2 = iban[-2:]        # Last 2 digits
+            return f"{row['BANKL']}-{middle_7}-{last_2}"
+        else:
+            return None  # or keep existing or empty
+
+    # Apply logic
+    df['BANKN for BE'] = df.apply(generate_bankn, axis=1)
+
     st.write("------------------------------------------------------------------------------------")            
     
     st.write("Step 3: Download Extracted Bank Data")
