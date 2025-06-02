@@ -108,29 +108,42 @@ if excel_file is not None:
     
     df.drop_duplicates(subset=['IBAN'], keep='first', inplace = True)
 
-    special_countries = ['IT', 'ES', 'FR', 'HU', 'CY', 'IL', 'BG', 'GR', 'IS', 'PL', 'TR']
+    # Country group with BANKL + Branch_code rule
+concat_countries = ['IT', 'ES', 'FR', 'CY', 'IL', 'BG', 'GR', 'IS']
 
-    # Create new column with condition
-    df['New_Bank_Key'] = df.apply(
-        lambda row: row['BANKL'] + row['Branch_code'] 
-        if row['BANKS'] in special_countries 
-        else row['BANKL'], 
-        axis=1
-    )
-
-
-    def generate_bankn(row):
-        if row['BANKS'] == 'BE':
-            iban = row['IBAN']
-            middle_7 = iban[-9:][:7]  # Get 9 from right, then take first 7
-            last_2 = iban[-2:]        # Last 2 digits
-            return f"{row['BANKL']}-{middle_7}-{last_2}"
+# Function to calculate bank key or BANKN based on country
+def compute_bank_key(row):
+    iban = row['IBAN']
+    country = row['Country code']
+    bankl = row['BANKL']
+    branch = row['Branch_code']
+    
+    try:
+        if country == 'FI':
+            return iban[:10][-6:]
+        elif country in ['GB', 'IE']:
+            return branch
+        elif country in ['PL', 'PT', 'SI', 'BA']:
+            return bankl + branch
+        elif country == 'HU':
+            return iban[:12][-8:]
+        elif country == 'SE':
+            return iban[:14][-4:]
+        elif country == 'TR':
+            return iban[:19][-12:]
+        elif country in concat_countries:
+            return bankl + branch
+        elif country == 'BE':
+            middle_7 = iban[-9:][:7]
+            last_2 = iban[-2:]
+            return f"{bankl}-{middle_7}-{last_2}"
         else:
-            return None  # or keep existing or empty
+            return bankl  # fallback or default
+    except:
+        return bankl  # in case of malformed data
 
-    # Apply logic
-    df['BANKN for BE'] = df.apply(generate_bankn, axis=1)
-
+# Apply logic
+df['bank_key'] = df.apply(compute_bank_key, axis=1)
     st.write("------------------------------------------------------------------------------------")            
     
     st.write("Step 3: Download Extracted Bank Data")
