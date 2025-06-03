@@ -114,7 +114,7 @@ concat_countries = ['IT', 'ES', 'FR', 'CY', 'IL', 'BG', 'GR', 'IS']
 # Function to calculate bank key or BANKN based on country
 def compute_bank_key(row):
     iban = row['IBAN']
-    country = row['Country code']
+    country = row['BANKS']
     bankl = row['BANKL']
     branch = row['Branch_code']
     
