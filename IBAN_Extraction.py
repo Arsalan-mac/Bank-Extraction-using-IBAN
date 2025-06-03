@@ -144,24 +144,24 @@ def compute_bank_key(row):
 
 # Apply logic
 df['bank_key'] = df.apply(compute_bank_key, axis=1)
-    st.write("------------------------------------------------------------------------------------")            
+st.write("------------------------------------------------------------------------------------")            
     
-    st.write("Step 3: Download Extracted Bank Data")
+st.write("Step 3: Download Extracted Bank Data")
 
     
-    # buffer to use for excel writer
-    buffer = io.BytesIO()
+# buffer to use for excel writer
+buffer = io.BytesIO()
+
+with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+# Write each dataframe to a different worksheet.
+    df.to_excel(writer, sheet_name='Sheet1', index = False)
+    # Close the Pandas Excel writer and output the Excel file to the buffer
+    writer.close()
+
+    download2 = st.download_button(
+        label="Download data as Excel",
+        data=buffer,
+        file_name = excel_file.name,
+        mime='application/vnd.ms-excel'
+    )
     
-    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-    # Write each dataframe to a different worksheet.
-        df.to_excel(writer, sheet_name='Sheet1', index = False)
-        # Close the Pandas Excel writer and output the Excel file to the buffer
-        writer.close()
-    
-        download2 = st.download_button(
-            label="Download data as Excel",
-            data=buffer,
-            file_name = excel_file.name,
-            mime='application/vnd.ms-excel'
-        )
-        
