@@ -161,7 +161,7 @@ with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
     download2 = st.download_button(
         label="Download data as Excel",
         data=buffer,
-        file_name = excel_file.name,
+        file_name = "IBAN Extraction.xlsx",
         mime='application/vnd.ms-excel'
     )
     
